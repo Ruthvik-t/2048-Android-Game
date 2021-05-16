@@ -28,4 +28,8 @@ class Grid constructor(
                 null)
         }
     }
+
+    override fun update() {
+
+    }
 }

@@ -87,4 +87,8 @@ class GameView : SurfaceView, SurfaceHolder.Callback, SwipeCallback {
     override fun onSwipe(direction: SwipeCallback.Direction) {
         tileManager.onSwipe(direction)
     }
+
+    internal fun update(){
+        tileManager.update()
+    }
 }

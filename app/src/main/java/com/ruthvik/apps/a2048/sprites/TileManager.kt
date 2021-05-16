@@ -8,6 +8,7 @@ import com.ruthvik.apps.a2048.R
 import com.ruthvik.apps.a2048.swipe.SwipeCallback
 import com.ruthvik.apps.a2048.swipe.SwipeCallback.Direction
 import com.ruthvik.apps.a2048.swipe.SwipeCallback.Direction.*
+import kotlin.random.Random
 
 class TileManager constructor(
     private val resources: Resources,
@@ -16,10 +17,14 @@ class TileManager constructor(
     private val standardSize: Int,
 ) : Sprite, TileManagerCallback {
 
-    private val tile = Tile(screenWidth, screenHeight, standardSize, this,1, 1)
-
     private val drawables = ArrayList<Int>()
     private val tileBitMaps = HashMap<Int, Bitmap>()
+
+    private var tileMatrix: Array<Array<Tile?>> = Array(4) { Array<Tile?>(4) { null } }
+
+    private var moving = false;
+
+    private lateinit var movingTiles: ArrayList<Tile?>
 
     private val defaultBitmap = Bitmap.createScaledBitmap(
         BitmapFactory.decodeResource(resources, R.drawable.one),
@@ -31,6 +36,7 @@ class TileManager constructor(
     init {
         initDrawables()
         initialiseTileBitmaps()
+        initGame()
     }
 
     private fun initDrawables() {
@@ -62,17 +68,99 @@ class TileManager constructor(
 
 
     override fun draw(canvas: Canvas) {
-        tile.draw(canvas)
+        for (i in 0..3) {
+            for (j in 0..3) {
+                tileMatrix[i][j]?.draw(canvas)
+            }
+        }
     }
 
     override fun getBitmap(count: Int): Bitmap = tileBitMaps.getOrElse(count) { defaultBitmap }
 
+    private fun initGame() {
+        for (i in 0..5) {
+            val x: Int = Random.nextInt(4)
+            val y: Int = Random.nextInt(4)
+
+            if (tileMatrix[x][y] == null) {
+                val tile = Tile(screenWidth, screenHeight, standardSize, this, x, y)
+                tileMatrix[x][y] = tile
+            }
+        }
+        movingTiles = arrayListOf()
+    }
+
+    override fun update() {
+        for (i in 0..3) {
+            for (j in 0..3) {
+                tileMatrix[i][j]?.update()
+            }
+        }
+    }
+
     fun onSwipe(direction: Direction) {
-        when(direction) {
-            UP -> {}
-            DOWN -> {}
-            RIGHT -> {}
-            LEFT -> {}
+        if(!moving) {
+            moving = true
+            val newMatrix: Array<Array<Tile?>> = Array(4) { Array<Tile?>(4) { null } }
+
+            when (direction) {
+                UP -> moveTilesUp(newMatrix)
+                DOWN -> {
+                }
+                RIGHT -> {
+                }
+                LEFT -> {
+                }
+            }
+            tileMatrix = newMatrix
+        }
+    }
+
+    private fun moveTilesUp(newMatrix: Array<Array<Tile?>>) {
+        for (i in 0..3) {
+            for (j in 0..3) {
+                tileMatrix[i][j]?.let { tile ->
+                    newMatrix[i][j] = tileMatrix[i][j]
+                    for (k in i - 1 downTo 0) {
+                        if (newMatrix[k][j] == null) {
+                            newMatrix[k][j] = tile
+                            if (newMatrix[k + 1][j] == tile)
+                                newMatrix[k + 1][j] = null
+                        } else if (newMatrix[k][j]?.getValue() == tile.getValue() && newMatrix[k][j]?.toIncrement != true) {
+                            newMatrix[k][j] = tile.increment()
+                            if (newMatrix[k + 1][j] == tile)
+                                newMatrix[k + 1][j] = null
+                        } else {
+                            break
+                        }
+                    }
+                }
+            }
+        }
+
+        for (i in 0..3) {
+            for (j in 0..3) {
+                val tile = tileMatrix[i][j]
+                var newTile: Tile? = null
+                var matrixX = 0
+                var matrixY = 0
+
+                for (a in 0..3) {
+                    for (b in 0..3) {
+                        if (newMatrix[a][b] == tileMatrix[i][j]) {
+                            newTile = newMatrix[a][b]
+                            matrixX = a
+                            matrixY = b
+                            break
+                        }
+                    }
+                }
+
+                newTile?.let {
+                    movingTiles.add(tile)
+                    tile?.move(matrixX, matrixY)
+                }
+            }
         }
     }
 }

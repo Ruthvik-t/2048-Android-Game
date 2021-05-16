@@ -34,6 +34,7 @@ class GameThread (
                 synchronized(surfaceHolder) {
                     gameView.apply {
                         draw(canvas)
+                        update()
                     }
                 }
             }catch (e: Exception) {
