@@ -1,6 +1,7 @@
 package com.ruthvik.apps.a2048
 
 import android.content.Context
+import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -9,6 +10,8 @@ import com.ruthvik.apps.a2048.sprites.Grid
 class GameView : SurfaceView, SurfaceHolder.Callback {
 
     private lateinit var grid: Grid
+
+    private var gameThread: GameThread? = null
 
     constructor(context: Context) : super(context) {
         initGameAndViews()
@@ -29,7 +32,10 @@ class GameView : SurfaceView, SurfaceHolder.Callback {
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
-
+        gameThread = GameThread(holder, this).also {
+            it.setRunning(true)
+            it.start()
+        }
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
@@ -38,5 +44,14 @@ class GameView : SurfaceView, SurfaceHolder.Callback {
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {
 
+    }
+
+    override fun draw(canvas: Canvas?) {
+        super.draw(canvas)
+
+        canvas?.let {
+            it.drawRGB(255,255,255) // white background for the screen
+            grid.draw(canvas)
+        }
     }
 }
