@@ -5,6 +5,9 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import com.ruthvik.apps.a2048.R
+import com.ruthvik.apps.a2048.swipe.SwipeCallback
+import com.ruthvik.apps.a2048.swipe.SwipeCallback.Direction
+import com.ruthvik.apps.a2048.swipe.SwipeCallback.Direction.*
 
 class TileManager constructor(
     private val resources: Resources,
@@ -63,4 +66,13 @@ class TileManager constructor(
     }
 
     override fun getBitmap(count: Int): Bitmap = tileBitMaps.getOrElse(count) { defaultBitmap }
+
+    fun onSwipe(direction: Direction) {
+        when(direction) {
+            UP -> {}
+            DOWN -> {}
+            RIGHT -> {}
+            LEFT -> {}
+        }
+    }
 }
