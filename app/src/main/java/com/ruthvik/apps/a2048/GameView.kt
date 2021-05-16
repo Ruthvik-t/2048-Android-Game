@@ -6,10 +6,12 @@ import android.util.AttributeSet
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import com.ruthvik.apps.a2048.sprites.Grid
+import com.ruthvik.apps.a2048.sprites.TileManager
 
 class GameView : SurfaceView, SurfaceHolder.Callback {
 
     private lateinit var grid: Grid
+    private lateinit var tileManager: TileManager
 
     private var gameThread: GameThread? = null
 
@@ -29,6 +31,7 @@ class GameView : SurfaceView, SurfaceHolder.Callback {
         val standardSize: Int = ((screenWidth * .88)/4).toInt() // standard size of tile
 
         grid = Grid(context.resources, screenWidth, screenHeight, standardSize)
+        tileManager = TileManager(context.resources, screenWidth, screenHeight, standardSize)
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
@@ -52,6 +55,7 @@ class GameView : SurfaceView, SurfaceHolder.Callback {
         canvas?.let {
             it.drawRGB(255,255,255) // white background for the screen
             grid.draw(canvas)
+            tileManager.draw(canvas)
         }
     }
 }
