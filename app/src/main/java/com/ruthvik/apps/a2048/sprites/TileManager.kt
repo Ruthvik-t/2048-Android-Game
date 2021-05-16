@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import com.ruthvik.apps.a2048.R
-import com.ruthvik.apps.a2048.swipe.SwipeCallback
 import com.ruthvik.apps.a2048.swipe.SwipeCallback.Direction
 import com.ruthvik.apps.a2048.swipe.SwipeCallback.Direction.*
 import kotlin.random.Random
@@ -99,18 +98,15 @@ class TileManager constructor(
     }
 
     fun onSwipe(direction: Direction) {
-        if(!moving) {
+        if (!moving) {
             moving = true
             val newMatrix: Array<Array<Tile?>> = Array(4) { Array<Tile?>(4) { null } }
 
             when (direction) {
                 UP -> moveTilesUp(newMatrix)
-                DOWN -> {
-                }
-                RIGHT -> {
-                }
-                LEFT -> {
-                }
+                DOWN -> moveTilesDown(newMatrix)
+                RIGHT -> moveTilesRight(newMatrix)
+                LEFT -> moveTilesLeft(newMatrix)
             }
             tileMatrix = newMatrix
         }
@@ -130,6 +126,162 @@ class TileManager constructor(
                             newMatrix[k][j] = tile.increment()
                             if (newMatrix[k + 1][j] == tile)
                                 newMatrix[k + 1][j] = null
+                        } else {
+                            break
+                        }
+                    }
+                }
+            }
+        }
+
+        for (i in 0..3) {
+            for (j in 0..3) {
+                val tile = tileMatrix[i][j]
+                var newTile: Tile? = null
+                var matrixX = 0
+                var matrixY = 0
+
+                for (a in 0..3) {
+                    for (b in 0..3) {
+                        if (newMatrix[a][b] == tileMatrix[i][j]) {
+                            newTile = newMatrix[a][b]
+                            matrixX = a
+                            matrixY = b
+                            break
+                        }
+                    }
+                }
+
+                newTile?.let {
+                    movingTiles.add(tile)
+                    tile?.move(matrixX, matrixY)
+                }
+            }
+        }
+    }
+
+    private fun moveTilesDown(newMatrix: Array<Array<Tile?>>) {
+        for (i in 3 downTo 0) {
+            for (j in 0..3) {
+                tileMatrix[i][j]?.let { tile ->
+                    newMatrix[i][j] = tileMatrix[i][j]
+
+                    for (k in i + 1..3) {
+                        if (newMatrix[k][j] == null) {
+                            newMatrix[k][j] = tile
+
+                            if (newMatrix[k - 1][j] == tile) {
+                                newMatrix[k - 1][j] = null
+                            }
+                        } else if (newMatrix[k][j]?.getValue() == tile.getValue() && newMatrix[k][j]?.toIncrement != true) {
+                            newMatrix[k][j] = tile.increment()
+
+                            if (newMatrix[k - 1][j] == tile) {
+                                newMatrix[k - 1][j] = null
+                            }
+                        } else {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        for (i in 3 downTo 0) {
+            for (j in 0..3) {
+                val tile = tileMatrix[i][j]
+                var newTile: Tile? = null
+                var matrixX = 0
+                var matrixY = 0
+
+                for (a in 0..3) {
+                    for (b in 0..3) {
+                        if (newMatrix[a][b] == tile) {
+                            newTile = newMatrix[a][b]
+                            matrixX = a
+                            matrixY = b
+                        }
+                    }
+                }
+
+                newTile?.let {
+                    movingTiles.add(tile)
+                    tile?.move(matrixX, matrixY)
+                }
+            }
+        }
+    }
+
+    private fun moveTilesRight(newMatrix: Array<Array<Tile?>>) {
+        for (i in 0..3) {
+            for (j in 3 downTo 0) {
+                tileMatrix[i][j]?.let { tile ->
+                    newMatrix[i][j] = tile
+
+                    for (k in j + 1..3) {
+                        if (newMatrix[i][k] == null) {
+                            newMatrix[i][k] = tile
+
+                            if (newMatrix[i][k - 1] == tile) {
+                                newMatrix[i][k - 1] = null
+                            }
+                        } else if (newMatrix[i][k]?.getValue() == tile.getValue() && newMatrix[i][k]?.toIncrement != true) {
+                            newMatrix[i][k] = tile.increment()
+                            if (newMatrix[i][k - 1] == tile) {
+                                newMatrix[i][k - 1] = null
+                            }
+                        } else {
+                            break
+                        }
+                    }
+                }
+            }
+        }
+
+        for (i in 0..3) {
+            for (j in 3 downTo 0) {
+                val tile = tileMatrix[i][j]
+                var newTile: Tile? = null
+                var matrixX = 0
+                var matrixY = 0
+
+                for (a in 0..3) {
+                    for (b in 0..3) {
+                        if (newMatrix[a][b] == tileMatrix[i][j]) {
+                            newTile = newMatrix[a][b]
+                            matrixX = a
+                            matrixY = b
+                            break
+                        }
+                    }
+                }
+
+                newTile?.let {
+                    movingTiles.add(tile)
+                    tile?.move(matrixX, matrixY)
+                }
+            }
+        }
+    }
+
+    private fun moveTilesLeft(newMatrix: Array<Array<Tile?>>) {
+        for (i in 0..3) {
+            for (j in 0..3) {
+                tileMatrix[i][j]?.let { tile ->
+                    newMatrix[i][j] = tile
+
+                    for (k in j - 1 downTo 0) {
+                        if (newMatrix[i][k] == null) {
+                            newMatrix[i][k] = tile
+
+                            if (newMatrix[i][k + 1] == tile) {
+                                newMatrix[i][k + 1] = null
+                            }
+                        } else if (newMatrix[i][k]?.getValue() == tile.getValue() && newMatrix[i][k]?.toIncrement != true) {
+                            newMatrix[i][k] = tile.increment()
+
+                            if (newMatrix[i][k + 1] == tile)
+                                newMatrix[i][k + 1] = null
                         } else {
                             break
                         }
