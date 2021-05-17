@@ -25,6 +25,8 @@ class TileManager constructor(
 
     private lateinit var movingTiles: ArrayList<Tile?>
 
+    private var toSpawn = false
+
     private val defaultBitmap = Bitmap.createScaledBitmap(
         BitmapFactory.decodeResource(resources, R.drawable.one),
         standardSize,
@@ -101,6 +103,7 @@ class TileManager constructor(
         movingTiles.remove(tile)
         if(movingTiles.isEmpty()) {
             moving = false
+            spawn()
         }
     }
 
@@ -114,6 +117,15 @@ class TileManager constructor(
                 DOWN -> moveTilesDown(newMatrix)
                 RIGHT -> moveTilesRight(newMatrix)
                 LEFT -> moveTilesLeft(newMatrix)
+            }
+
+            for (i in 0..3) {
+                for (j in 0..3) {
+                    if(newMatrix[i][j] != tileMatrix[i][j]){
+                        toSpawn = true
+                        break
+                    }
+                }
             }
             tileMatrix = newMatrix
         }
@@ -323,5 +335,19 @@ class TileManager constructor(
         }
     }
 
+    private fun spawn() {
+        if(toSpawn){
+            toSpawn = false
+            var tile: Tile? = null
+            while(tile == null) {
+                val x: Int = Random.nextInt(4)
+                val y: Int = Random.nextInt(4)
+                if(tileMatrix[x][y] == null) {
+                    tile = Tile(screenWidth, screenHeight, standardSize, this, x, y)
+                    tileMatrix[x][y] = tile
+                }
+            }
+        }
+    }
 
 }
