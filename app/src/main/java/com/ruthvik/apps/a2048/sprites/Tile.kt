@@ -3,6 +3,9 @@ package com.ruthvik.apps.a2048.sprites
 import android.graphics.Canvas
 import kotlin.math.pow
 
+/**
+ * Represents and hold the behaviour of each tile in the grid.
+ */
 class Tile constructor(
     private val screenWidth: Int,
     private val screenHeight: Int,
