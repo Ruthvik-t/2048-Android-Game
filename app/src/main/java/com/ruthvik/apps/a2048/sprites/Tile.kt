@@ -49,6 +49,7 @@ class Tile constructor(
                 count++
                 toIncrement = false
             }
+            tileManagerCallback.finishedMoving(this)
         }
     }
 

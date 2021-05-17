@@ -5,4 +5,6 @@ import android.graphics.Bitmap
 interface TileManagerCallback {
 
     fun getBitmap(count: Int): Bitmap
+
+    fun finishedMoving(tile: Tile)
 }

@@ -97,6 +97,13 @@ class TileManager constructor(
         }
     }
 
+    override fun finishedMoving(tile: Tile) {
+        movingTiles.remove(tile)
+        if(movingTiles.isEmpty()) {
+            moving = false
+        }
+    }
+
     fun onSwipe(direction: Direction) {
         if (!moving) {
             moving = true
@@ -315,4 +322,6 @@ class TileManager constructor(
             }
         }
     }
+
+
 }
