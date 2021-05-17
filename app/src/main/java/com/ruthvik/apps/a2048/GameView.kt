@@ -8,6 +8,7 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import com.ruthvik.apps.a2048.sprites.EndGame
 import com.ruthvik.apps.a2048.sprites.Grid
+import com.ruthvik.apps.a2048.sprites.Score
 import com.ruthvik.apps.a2048.sprites.TileManager
 import com.ruthvik.apps.a2048.swipe.SwipeCallback
 import com.ruthvik.apps.a2048.swipe.SwipeListener
@@ -18,6 +19,7 @@ class GameView : SurfaceView, SurfaceHolder.Callback, SwipeCallback, GameManager
     private lateinit var tileManager: TileManager
     private lateinit var swipeListener: SwipeListener
     private lateinit var endGameSprite: EndGame
+    private lateinit var score: Score
 
     private var gameThread: GameThread? = null
 
@@ -43,6 +45,12 @@ class GameView : SurfaceView, SurfaceHolder.Callback, SwipeCallback, GameManager
         tileManager = TileManager(context.resources, screenWidth, screenHeight, standardSize, this)
         swipeListener = SwipeListener(context, this)
         endGameSprite = EndGame(context.resources, screenWidth, screenHeight)
+        score = Score(context.resources, screenWidth, screenHeight, standardSize)
+    }
+
+    private fun restartGame() {
+        endGame = false
+        tileManager.restartGame()
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
@@ -53,8 +61,13 @@ class GameView : SurfaceView, SurfaceHolder.Callback, SwipeCallback, GameManager
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        event?.let {
-            swipeListener.onTouchEvent(it)
+        if(endGame) {
+            if(event?.action == MotionEvent.ACTION_DOWN)
+                restartGame()
+        } else {
+            event?.let {
+                swipeListener.onTouchEvent(it)
+            }
         }
         return super.onTouchEvent(event)
     }
@@ -86,6 +99,7 @@ class GameView : SurfaceView, SurfaceHolder.Callback, SwipeCallback, GameManager
             it.drawRGB(255,255,255) // white background for the screen
             grid.draw(canvas)
             tileManager.draw(canvas)
+            score.draw(canvas)
 
             if(endGame) {
                 endGameSprite.draw(it)
@@ -99,6 +113,10 @@ class GameView : SurfaceView, SurfaceHolder.Callback, SwipeCallback, GameManager
 
     override fun gameOver() {
         endGame = true
+    }
+
+    override fun updateScore(delta: Int) {
+        score.updateScore(delta)
     }
 
     internal fun update(){

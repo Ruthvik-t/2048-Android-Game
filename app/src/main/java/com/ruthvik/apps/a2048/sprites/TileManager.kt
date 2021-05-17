@@ -87,7 +87,7 @@ class TileManager constructor(
     override fun getBitmap(count: Int): Bitmap = tileBitMaps.getOrElse(count) { defaultBitmap }
 
     private fun initGame() {
-        for (i in 0..5) {
+        for (i in 0..2) {
             val x: Int = Random.nextInt(4)
             val y: Int = Random.nextInt(4)
 
@@ -97,6 +97,15 @@ class TileManager constructor(
             }
         }
         movingTiles = arrayListOf()
+    }
+
+    fun restartGame() {
+        for(i in 0..3){
+            for(j in 0..3)
+                tileMatrix[i][j] = null
+        }
+        endGame = false
+        initGame()
     }
 
     override fun update() {
@@ -114,6 +123,10 @@ class TileManager constructor(
             spawn()
             checkEndGame()
         }
+    }
+
+    override fun updateScore(delta: Int) {
+        gameManagerCallback.updateScore(delta)
     }
 
     fun onSwipe(direction: Direction) {

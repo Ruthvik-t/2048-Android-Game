@@ -1,6 +1,7 @@
 package com.ruthvik.apps.a2048.sprites
 
 import android.graphics.Canvas
+import kotlin.math.pow
 
 class Tile constructor(
     private val screenWidth: Int,
@@ -48,6 +49,8 @@ class Tile constructor(
             if(toIncrement) {
                 count++
                 toIncrement = false
+                val amount = 2.toDouble().pow(count.toDouble()).toInt()
+                tileManagerCallback.updateScore(amount)
             }
             tileManagerCallback.finishedMoving(this)
         }
