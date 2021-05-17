@@ -4,6 +4,7 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
+import com.ruthvik.apps.a2048.GameManagerCallback
 import com.ruthvik.apps.a2048.R
 import com.ruthvik.apps.a2048.swipe.SwipeCallback.Direction
 import com.ruthvik.apps.a2048.swipe.SwipeCallback.Direction.*
@@ -14,6 +15,7 @@ class TileManager constructor(
     private val screenWidth: Int,
     private val screenHeight: Int,
     private val standardSize: Int,
+    private val gameManagerCallback: GameManagerCallback,
 ) : Sprite, TileManagerCallback {
 
     private val drawables = ArrayList<Int>()
@@ -26,6 +28,8 @@ class TileManager constructor(
     private lateinit var movingTiles: ArrayList<Tile?>
 
     private var toSpawn = false
+
+    private var endGame = false
 
     private val defaultBitmap = Bitmap.createScaledBitmap(
         BitmapFactory.decodeResource(resources, R.drawable.one),
@@ -74,6 +78,10 @@ class TileManager constructor(
                 tileMatrix[i][j]?.draw(canvas)
             }
         }
+
+        if(endGame){
+            gameManagerCallback.gameOver()
+        }
     }
 
     override fun getBitmap(count: Int): Bitmap = tileBitMaps.getOrElse(count) { defaultBitmap }
@@ -104,6 +112,7 @@ class TileManager constructor(
         if(movingTiles.isEmpty()) {
             moving = false
             spawn()
+            checkEndGame()
         }
     }
 
@@ -330,6 +339,34 @@ class TileManager constructor(
                 newTile?.let {
                     movingTiles.add(tile)
                     tile?.move(matrixX, matrixY)
+                }
+            }
+        }
+    }
+
+    private fun checkEndGame() {
+        endGame = true
+
+        for(i in 0..3) {
+            for(j in 0..3) {
+                if(tileMatrix[i][j] == null){
+                    endGame = false
+                    break
+                }
+            }
+        }
+
+        if(endGame) {
+            for(i in 0..3) {
+                for(j in 0..3) {
+                    if(i > 0 &&
+                        tileMatrix[i-1][j]?.getValue() == tileMatrix[i][j]?.getValue() ||
+                        (i<3 && tileMatrix[i+1][j]?.getValue() == tileMatrix[i][j]?.getValue()) ||
+                        (j>0 && tileMatrix[i][j-1]?.getValue() == tileMatrix[i][j]?.getValue()) ||
+                        (j<3 && tileMatrix[i][j+1]?.getValue() == tileMatrix[i][j]?.getValue())
+                    ) {
+                        endGame = false
+                    }
                 }
             }
         }

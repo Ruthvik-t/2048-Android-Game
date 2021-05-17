@@ -6,18 +6,22 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import com.ruthvik.apps.a2048.sprites.EndGame
 import com.ruthvik.apps.a2048.sprites.Grid
 import com.ruthvik.apps.a2048.sprites.TileManager
 import com.ruthvik.apps.a2048.swipe.SwipeCallback
 import com.ruthvik.apps.a2048.swipe.SwipeListener
 
-class GameView : SurfaceView, SurfaceHolder.Callback, SwipeCallback {
+class GameView : SurfaceView, SurfaceHolder.Callback, SwipeCallback, GameManagerCallback {
 
     private lateinit var grid: Grid
     private lateinit var tileManager: TileManager
     private lateinit var swipeListener: SwipeListener
+    private lateinit var endGameSprite: EndGame
 
     private var gameThread: GameThread? = null
+
+    private var endGame = false
 
     constructor(context: Context) : super(context) {
         initGameAndViews()
@@ -36,8 +40,9 @@ class GameView : SurfaceView, SurfaceHolder.Callback, SwipeCallback {
         isLongClickable = true
 
         grid = Grid(context.resources, screenWidth, screenHeight, standardSize)
-        tileManager = TileManager(context.resources, screenWidth, screenHeight, standardSize)
+        tileManager = TileManager(context.resources, screenWidth, screenHeight, standardSize, this)
         swipeListener = SwipeListener(context, this)
+        endGameSprite = EndGame(context.resources, screenWidth, screenHeight)
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
@@ -81,6 +86,10 @@ class GameView : SurfaceView, SurfaceHolder.Callback, SwipeCallback {
             it.drawRGB(255,255,255) // white background for the screen
             grid.draw(canvas)
             tileManager.draw(canvas)
+
+            if(endGame) {
+                endGameSprite.draw(it)
+            }
         }
     }
 
@@ -88,7 +97,13 @@ class GameView : SurfaceView, SurfaceHolder.Callback, SwipeCallback {
         tileManager.onSwipe(direction)
     }
 
+    override fun gameOver() {
+        endGame = true
+    }
+
     internal fun update(){
-        tileManager.update()
+        if(!endGame) {
+            tileManager.update()
+        }
     }
 }
